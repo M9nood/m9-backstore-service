@@ -24,5 +24,5 @@ func NewProductService() *ProductService {
 }
 
 func (pd ProductService) GetProductsService() (string, iterror.ErrorException) {
-	return "eieie", nil
+	return "products", nil
 }

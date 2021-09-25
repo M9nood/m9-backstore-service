@@ -5,14 +5,14 @@ import (
 
 	service "m9-backstore-service/services"
 
-	"github.com/gin-gonic/gin"
+	"github.com/labstack/echo/v4"
 )
 
-func GetProductsHandler(c *gin.Context) {
+func GetProductsHandler(c echo.Context) error {
 	productService := service.NewProductService()
 	products, err := productService.GetProductsService()
 	if err != nil {
-		c.JSON(err.GetHttpCode(), CreateErrorResponse(err))
+		return c.JSON(err.GetHttpCode(), CreateErrorResponse(err))
 	}
-	c.JSON(http.StatusOK, CreateSuccessResponse(products))
+	return c.JSON(http.StatusOK, CreateSuccessResponse(products))
 }
