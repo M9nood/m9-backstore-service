@@ -8,6 +8,7 @@ import (
 	router "m9-backstore-service/routes"
 
 	"github.com/joho/godotenv"
+	_ "github.com/joho/godotenv/autoload"
 )
 
 func main() {
