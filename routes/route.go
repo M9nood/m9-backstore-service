@@ -16,7 +16,7 @@ func RouterSetup() {
 		return c.JSON(http.StatusOK, map[string]string{
 			"message": "Service OK",
 			"port":    port,
-			"db":      os.Getenv("DATABASE_URL"),
+			"env":     os.Getenv("APP_ENV"),
 		})
 	})
 

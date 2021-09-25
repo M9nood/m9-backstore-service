@@ -12,9 +12,11 @@ import (
 )
 
 func main() {
-	err := godotenv.Load()
-	if err != nil {
-		log.Fatal("Error loading .env file")
+	if os.Getenv("APP_ENV") == "development" {
+		err := godotenv.Load()
+		if err != nil {
+			log.Fatal("Error loading .env file")
+		}
 	}
 	db := database.DBConnect(os.Getenv("DATABASE_URL"))
 	router.RouterSetup()
