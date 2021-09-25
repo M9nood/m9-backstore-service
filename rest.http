@@ -1,0 +1,2 @@
+### Get Products
+GET http://localhost:8080/products

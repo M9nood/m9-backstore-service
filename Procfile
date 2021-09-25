@@ -1,0 +1,1 @@
+web: bin/m9-backstore-service
