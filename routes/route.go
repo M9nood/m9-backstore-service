@@ -2,6 +2,7 @@ package route
 
 import (
 	"net/http"
+	"os"
 
 	controller "m9-backstore-service/controllers"
 
@@ -9,6 +10,7 @@ import (
 )
 
 func RouterSetup() {
+	port := os.Getenv("PORT")
 	e := echo.New()
 	e.GET("/", func(c echo.Context) error {
 		return c.JSON(http.StatusOK, "bkst, OK!")
@@ -17,5 +19,5 @@ func RouterSetup() {
 	products := e.Group("/products")
 	products.GET("", controller.GetProductsHandler)
 
-	e.Logger.Fatal(e.Start(":8080"))
+	e.Logger.Fatal(e.Start(":" + port))
 }
