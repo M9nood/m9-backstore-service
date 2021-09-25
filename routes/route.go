@@ -6,22 +6,22 @@ import (
 
 	controller "m9-backstore-service/controllers"
 
-	"github.com/gin-gonic/gin"
+	"github.com/labstack/echo/v4"
 )
 
 func RouterSetup() {
 	port := os.Getenv("PORT")
-	router := gin.New()
-	router.Use(gin.Logger())
-
-	router.GET("/", func(c *gin.Context) {
-		c.JSON(http.StatusOK, gin.H{
-			"message": "Service OK.",
+	e := echo.New()
+	e.GET("/", func(c echo.Context) error {
+		return c.JSON(http.StatusOK, map[string]string{
+			"message": "Service OK",
 			"port":    port,
+			"db":      os.Getenv("DATABASE_URL"),
 		})
 	})
-	router.GET("/products", controller.GetProductsHandler)
 
-	router.Run(":" + port)
+	products := e.Group("/products")
+	products.GET("", controller.GetProductsHandler)
 
+	e.Logger.Fatal(e.Start(":" + port))
 }
