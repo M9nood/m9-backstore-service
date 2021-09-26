@@ -2,24 +2,36 @@ package database
 
 import (
 	"fmt"
+	"os"
 
-	"github.com/go-pg/pg/v10"
+	"github.com/jinzhu/gorm"
+	_ "github.com/jinzhu/gorm/dialects/postgres"
 )
 
-var Db *pg.DB
+var Db *gorm.DB
 
-func DBConnect(url string) *pg.DB {
-	url = "postgres://vqlrlplcqgtkot:4d00ea2ad1bc6d128b1d8ad64b31084c004f266487575e568b85c815e3590de6@ec2-3-220-214-162.compute-1.amazonaws.com:5432/dfv0fqufuui5sq"
-	opt, err := pg.ParseURL(url)
+func Connect() *gorm.DB {
+	host := os.Getenv("DB_HOST")
+	user := os.Getenv("DB_USER")
+	password := os.Getenv("DB_PASSWORD")
+	dbName := os.Getenv("DB_NAME")
+	port := os.Getenv("DB_PORT")
+	dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s", host, user, password, dbName, port)
+
+	Db, err := gorm.Open("postgres", dsn)
+
 	if err != nil {
 		fmt.Println("err", err)
 		panic(err)
 	}
-
-	db := pg.Connect(opt)
-	return db
+	fmt.Println("database connected.")
+	return Db
 }
 
-func GetDB() *pg.DB {
+func GetDB() *gorm.DB {
 	return Db
+}
+
+func CloseDB() {
+	Db.Close()
 }

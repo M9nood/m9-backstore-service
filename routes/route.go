@@ -6,12 +6,14 @@ import (
 
 	controller "m9-backstore-service/controllers"
 
+	productHttp "m9-backstore-service/controllers/http"
+
+	"github.com/jinzhu/gorm"
 	"github.com/labstack/echo/v4"
 )
 
-func RouterSetup() {
+func RouterSetup(e *echo.Echo, db *gorm.DB) *echo.Echo {
 	port := os.Getenv("PORT")
-	e := echo.New()
 	e.GET("/", func(c echo.Context) error {
 		return c.JSON(http.StatusOK, map[string]string{
 			"message": "Service OK",
@@ -20,8 +22,10 @@ func RouterSetup() {
 		})
 	})
 
-	products := e.Group("/products")
-	products.GET("", controller.GetProductsHandler)
+	pd := controller.NewProductController(db)
+	pdRoute := productHttp.NewProductHttpRoute(pd)
+	pdRoute.Route(e)
 
-	e.Logger.Fatal(e.Start(":" + port))
+	return e
+
 }

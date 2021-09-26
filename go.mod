@@ -6,7 +6,12 @@ go 1.16
 
 require (
 	github.com/M9nood/go-iterror v1.1.0
-	github.com/go-pg/pg/v10 v10.10.6
-	github.com/joho/godotenv v1.4.0
+	github.com/davecgh/go-spew v1.1.1 // indirect
+	github.com/jinzhu/gorm v1.9.16
+	github.com/jinzhu/now v1.1.2 // indirect
 	github.com/labstack/echo/v4 v4.6.0
+	github.com/lib/pq v1.10.2 // indirect
+	github.com/subosito/gotenv v1.2.0
+	golang.org/x/crypto v0.0.0-20210921155107-089bfa567519 // indirect
+	golang.org/x/sys v0.0.0-20210923061019-b8560ed6a9b7 // indirect
 )
