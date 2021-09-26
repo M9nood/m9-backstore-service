@@ -5,8 +5,7 @@ import (
 	"os"
 
 	controller "m9-backstore-service/controllers"
-
-	productHttp "m9-backstore-service/controllers/http"
+	transport "m9-backstore-service/controllers/http"
 
 	"github.com/jinzhu/gorm"
 	"github.com/labstack/echo/v4"
@@ -23,8 +22,12 @@ func RouterSetup(e *echo.Echo, db *gorm.DB) *echo.Echo {
 	})
 
 	pd := controller.NewProductController(db)
-	pdRoute := productHttp.NewProductHttpRoute(pd)
+	pdRoute := transport.NewProductHttpRoute(pd)
 	pdRoute.Route(e)
+
+	lb := controller.NewLineBotController(db)
+	lbRoute := transport.NewLineBotHttpRoute(lb)
+	lbRoute.Route(e)
 
 	return e
 

@@ -25,8 +25,5 @@ func (repo *ProductReposity) GetProducts() ([]product.ProductSchema, iterror.Err
 		fmt.Println("erro", result.Error)
 		return products, iterror.ErrorInternalServer("Error get products")
 	}
-	// if err := repo.Db.Table("product").Find(&products).Error; err != nil {
-	// 	return products, iterror.ErrorInternalServer("Error get products")
-	// }
 	return products, nil
 }

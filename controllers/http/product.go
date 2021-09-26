@@ -6,17 +6,17 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-type httpRoute struct {
-	handler controller.Handler
+type productHttpRoute struct {
+	handler controller.ProductHandler
 }
 
-func NewProductHttpRoute(productHandler controller.Handler) httpRoute {
-	return httpRoute{
+func NewProductHttpRoute(productHandler controller.ProductHandler) productHttpRoute {
+	return productHttpRoute{
 		handler: productHandler,
 	}
 }
 
-func (h httpRoute) Route(e *echo.Echo) {
+func (h productHttpRoute) Route(e *echo.Echo) {
 	apiV1 := e.Group("/api/v1")
 	productRoute := apiV1.Group("/products")
 	productRoute.GET("", h.handler.GetProductsHandler)
