@@ -5,7 +5,6 @@ import (
 	"net/http"
 
 	"m9-backstore-service/models/line"
-
 	service "m9-backstore-service/services"
 
 	"github.com/jinzhu/gorm"
@@ -27,7 +26,7 @@ func (h *BotHandler) BotReplyHandler(c echo.Context) error {
 	Line := new(line.LineMessage)
 	if err := c.Bind(Line); err != nil {
 		log.Println("err")
-		return c.String(http.StatusOK, "error")
+		return c.String(http.StatusInternalServerError, "error")
 	}
 	if len(Line.Events) > 0 {
 		h.lineBotService.WatchAndReplyMessage(Line)
