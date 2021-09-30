@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"m9-backstore-service/database"
+	"m9-backstore-service/pkg"
 	"os"
 	"os/signal"
 	"time"
@@ -24,6 +25,8 @@ func main() {
 	e.Use(middleware.GzipWithConfig(middleware.GzipConfig{
 		Level: 6,
 	}))
+	e.Validator = pkg.NewValidationUtil()
+
 	db := database.Connect()
 	defer db.Close()
 

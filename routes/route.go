@@ -29,6 +29,10 @@ func RouterSetup(e *echo.Echo, db *gorm.DB) *echo.Echo {
 	lbRoute := transport.NewLineBotHttpRoute(lb)
 	lbRoute.Route(e)
 
+	auth := controller.NewAuthController(db)
+	authRoute := transport.NewAuthHttpRoute(auth)
+	authRoute.Route(e)
+
 	return e
 
 }

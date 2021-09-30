@@ -18,13 +18,19 @@ func CreateSuccessResponse(data interface{}) model.ServiceResponse {
 }
 
 // CreateErrorResponse - create fail response
-func CreateErrorResponse(err iterror.ErrorException) model.ServiceResponse {
+func CreateErrorResponse(err iterror.ErrorException, data ...interface{}) model.ServiceResponse {
+	var errMsg interface{}
+	if len(data) > 0 {
+		errMsg = data[0]
+	} else {
+		errMsg = err.Error()
+	}
 	return model.ServiceResponse{
 		Status:       false,
 		ServiceCode:  serviceCode,
 		Data:         nil,
 		ErrorCode:    err.GetCode(),
 		ErrorName:    err.GetName(),
-		ErrorMessage: err.Error(),
+		ErrorMessage: errMsg,
 	}
 }
