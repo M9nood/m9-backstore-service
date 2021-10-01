@@ -7,6 +7,8 @@ import (
 	controller "m9-backstore-service/controllers"
 	transport "m9-backstore-service/controllers/http"
 
+	util "m9-backstore-service/utils"
+
 	"github.com/jinzhu/gorm"
 	"github.com/labstack/echo/v4"
 )
@@ -18,6 +20,14 @@ func RouterSetup(e *echo.Echo, db *gorm.DB) *echo.Echo {
 			"message": "Service OK",
 			"port":    port,
 			"env":     os.Getenv("APP_ENV"),
+		})
+	})
+	e.GET("/hash", func(c echo.Context) error {
+		text := "test"
+		sault := "Adsar"
+		hash := util.EncryptSHA1(text, sault)
+		return c.JSON(http.StatusOK, map[string]string{
+			"hash": hash,
 		})
 	})
 

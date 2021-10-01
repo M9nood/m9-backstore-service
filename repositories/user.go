@@ -2,6 +2,7 @@ package repository
 
 import (
 	"m9-backstore-service/models/user"
+	util "m9-backstore-service/utils"
 	"strings"
 
 	iterror "github.com/M9nood/go-iterror"
@@ -12,10 +13,20 @@ type UserReposity struct {
 	Db *gorm.DB
 }
 
-func NewUserReposity(Db *gorm.DB) *UserReposity {
+type UserReposityInterface interface {
+	CreateUser(user user.UserCreateRequest, tx ...*gorm.DB) (user.UserCreateRequest, iterror.ErrorException)
+	IsExistUser(username string, email string, tx ...*gorm.DB) (bool, iterror.ErrorException)
+	GetDB() *gorm.DB
+}
+
+func NewUserReposity(Db *gorm.DB) UserReposityInterface {
 	return &UserReposity{
 		Db: Db,
 	}
+}
+
+func (r *UserReposity) GetDB() *gorm.DB {
+	return r.Db
 }
 
 func (r *UserReposity) CreateUser(user user.UserCreateRequest, tx ...*gorm.DB) (user.UserCreateRequest, iterror.ErrorException) {
@@ -26,6 +37,10 @@ func (r *UserReposity) CreateUser(user user.UserCreateRequest, tx ...*gorm.DB) (
 		db = r.Db
 	}
 	user.Email = strings.ToLower(user.Email)
+	passSult := util.StringRandom(8)
+	passHash := util.EncryptSHA1(util.EncryptSHA1(user.Password), passSult)
+	user.Password = passHash
+	user.PassSault = passSult
 	if err := db.Table("user").Create(&user).Error; err != nil {
 		return user, iterror.ErrorInternalServer("Error create user")
 	}

@@ -14,7 +14,7 @@ import (
 )
 
 type AuthHandler struct {
-	authService *service.AuthService
+	authService service.AuthServiceInterface
 }
 
 func NewAuthController(db *gorm.DB) AuthHandler {
@@ -39,4 +39,8 @@ func (h *AuthHandler) RegisterHandler(c echo.Context) error {
 		return c.JSON(err.GetHttpCode(), CreateErrorResponse(err))
 	}
 	return c.JSON(http.StatusOK, CreateSuccessResponse(products))
+}
+
+func (h *AuthHandler) LoginHandler(c echo.Context) error {
+	return c.JSON(http.StatusOK, CreateSuccessResponse(""))
 }

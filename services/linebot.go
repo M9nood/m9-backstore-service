@@ -21,17 +21,18 @@ type LineBotService struct {
 	Db                  *gorm.DB
 }
 
-var lineBotServiceInstance *LineBotService
+type LineBotServiceInterface interface {
+	InitBot() (bot *linebot.Client)
+	WatchAndReplyMessage(lineMsg *line.LineMessage) error
+	CreateMessageByTriggerMessage(botBrain line.BotBrain) ([]linebot.SendingMessage, error)
+}
 
-func NewLineBotService(db *gorm.DB) *LineBotService {
-	if lineBotServiceInstance == nil {
-		lineBotServiceInstance = &LineBotService{
-			ChannelSecret:       os.Getenv("LINE_CHANNEL_SECRET"),
-			ChannelAccesssToken: os.Getenv("LINE_CHANNEL_ACCESS_TOKEN"),
-			Db:                  db,
-		}
+func NewLineBotService(db *gorm.DB) LineBotServiceInterface {
+	return &LineBotService{
+		ChannelSecret:       os.Getenv("LINE_CHANNEL_SECRET"),
+		ChannelAccesssToken: os.Getenv("LINE_CHANNEL_ACCESS_TOKEN"),
+		Db:                  db,
 	}
-	return lineBotServiceInstance
 }
 
 func (s LineBotService) InitBot() (bot *linebot.Client) {

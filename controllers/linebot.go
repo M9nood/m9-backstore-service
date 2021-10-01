@@ -12,7 +12,7 @@ import (
 )
 
 type BotHandler struct {
-	lineBotService *service.LineBotService
+	lineBotService service.LineBotServiceInterface
 }
 
 func NewLineBotController(db *gorm.DB) BotHandler {

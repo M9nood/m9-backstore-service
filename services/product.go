@@ -11,20 +11,19 @@ import (
 
 type ProductService struct {
 	Db          *gorm.DB
-	ProductRepo *repository.ProductReposity
+	ProductRepo repository.ProductReposityInterface
 }
 
-var productServiceInstance *ProductService
+type ProductServiceInterface interface {
+	GetProductsService() ([]product.ProductSchema, iterror.ErrorException)
+}
 
-func NewProductService(db *gorm.DB) *ProductService {
-	if productServiceInstance == nil {
-		productRepo := repository.NewProductReposity(db)
-		productServiceInstance = &ProductService{
-			Db:          db,
-			ProductRepo: productRepo,
-		}
+func NewProductService(db *gorm.DB) ProductServiceInterface {
+	productRepo := repository.NewProductReposity(db)
+	return &ProductService{
+		Db:          db,
+		ProductRepo: productRepo,
 	}
-	return productServiceInstance
 }
 
 func (s ProductService) GetProductsService() ([]product.ProductSchema, iterror.ErrorException) {

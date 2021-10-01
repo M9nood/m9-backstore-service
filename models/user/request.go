@@ -1,8 +1,9 @@
 package user
 
 type UserCreateRequest struct {
-	Id       int    `gorm:"column:id" json:"id,omitempty"`
-	UserName string `gorm:"column:username" json:"username"`
-	Email    string `gorm:"column:email" json:"email"`
-	Password string `gorm:"column:password" json:"password,omitempty"`
+	Id        int    `gorm:"column:id" json:"id,omitempty"`
+	UserName  string `gorm:"column:username" json:"username"`
+	Email     string `gorm:"column:email" json:"email"`
+	Password  string `gorm:"column:password" json:"password,omitempty"`
+	PassSault string `gorm:"column:pass_sault" json:"pass_sault,omitempty"`
 }

@@ -11,7 +11,12 @@ type StoreReposity struct {
 	Db *gorm.DB
 }
 
-func NewStoreReposity(Db *gorm.DB) *StoreReposity {
+type StoreReposityInterface interface {
+	CreateStore(store store.StoreCreateRequest, tx ...*gorm.DB) (store.StoreCreateRequest, iterror.ErrorException)
+	CreateStoreOwner(owner store.StoreOwnerCreateRequest, tx ...*gorm.DB) (store.StoreOwnerCreateRequest, iterror.ErrorException)
+}
+
+func NewStoreReposity(Db *gorm.DB) StoreReposityInterface {
 	return &StoreReposity{
 		Db: Db,
 	}
@@ -28,4 +33,17 @@ func (r *StoreReposity) CreateStore(store store.StoreCreateRequest, tx ...*gorm.
 		return store, iterror.ErrorInternalServer("Error create store")
 	}
 	return store, nil
+}
+
+func (r *StoreReposity) CreateStoreOwner(owner store.StoreOwnerCreateRequest, tx ...*gorm.DB) (store.StoreOwnerCreateRequest, iterror.ErrorException) {
+	var db *gorm.DB
+	if len(tx) > 0 {
+		db = tx[0]
+	} else {
+		db = r.Db
+	}
+	if err := db.Table("store_owner").Create(&owner).Error; err != nil {
+		return owner, iterror.ErrorInternalServer("Error create store owner")
+	}
+	return owner, nil
 }

@@ -13,27 +13,26 @@ import (
 
 type AuthService struct {
 	Db        *gorm.DB
-	UserRepo  *repository.UserReposity
-	StoreRepo *repository.StoreReposity
+	UserRepo  repository.UserReposityInterface
+	StoreRepo repository.StoreReposityInterface
 }
 
-var authServiceInstance *AuthService
+type AuthServiceInterface interface {
+	RegisterService(register auth.RegisterRequest) (resp string, errSvc iterror.ErrorException)
+}
 
-func NewAuthService(db *gorm.DB) *AuthService {
-	if authServiceInstance == nil {
-		userRepo := repository.NewUserReposity(db)
-		storeRepo := repository.NewStoreReposity(db)
-		authServiceInstance = &AuthService{
-			Db:        db,
-			UserRepo:  userRepo,
-			StoreRepo: storeRepo,
-		}
+func NewAuthService(db *gorm.DB) AuthServiceInterface {
+	userRepo := repository.NewUserReposity(db)
+	storeRepo := repository.NewStoreReposity(db)
+	return &AuthService{
+		Db:        db,
+		UserRepo:  userRepo,
+		StoreRepo: storeRepo,
 	}
-	return authServiceInstance
 }
 
 func (s AuthService) RegisterService(register auth.RegisterRequest) (resp string, errSvc iterror.ErrorException) {
-	db := s.UserRepo.Db
+	db := s.UserRepo.GetDB()
 	tx := db.Begin()
 	defer func() {
 		if r := recover(); r != nil {
@@ -70,8 +69,16 @@ func (s AuthService) RegisterService(register auth.RegisterRequest) (resp string
 		errSvc = err
 		panic(errSvc)
 	}
-	fmt.Println("resutltUser", resultUser)
-	fmt.Println("resultStore", resultStore)
+	storeOwnerCreate := store.StoreOwnerCreateRequest{
+		OwnerType: 1,
+		UserId:    resultUser.Id,
+		StoreId:   resultStore.Id,
+	}
+	if _, err := s.StoreRepo.CreateStoreOwner(storeOwnerCreate, tx); err != nil {
+		fmt.Println("error create store owner", err)
+		errSvc = err
+		panic(errSvc)
+	}
 	tx.Commit()
 	return "Register was succesful", nil
 }

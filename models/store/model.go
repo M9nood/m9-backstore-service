@@ -15,3 +15,13 @@ type StoreSchema struct {
 	UpatedAt   null.Time      `gorm:"column:updated_at" json:"updated_at"`
 	DeleteFlag int            `gorm:"column:delete_flag" json:"delete_flag"`
 }
+
+type StoreOwnerSchema struct {
+	Id         int       `gorm:"column:id" json:"id,omitempty"`
+	OwnerType  int       `gorm:"column:owner_type" json:"owner_type"`
+	UserId     int       `gorm:"column:user_id" json:"user_id"`
+	StoreId    int       `gorm:"column:store_id" json:"store_id"`
+	CreatedAt  null.Time `gorm:"column:created_at" json:"created_at"`
+	UpatedAt   null.Time `gorm:"column:updated_at" json:"updated_at"`
+	DeleteFlag int       `gorm:"column:delete_flag" json:"delete_flag"`
+}

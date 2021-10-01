@@ -12,7 +12,11 @@ type ProductReposity struct {
 	Db *gorm.DB
 }
 
-func NewProductReposity(Db *gorm.DB) *ProductReposity {
+type ProductReposityInterface interface {
+	GetProducts() ([]product.ProductSchema, iterror.ErrorException)
+}
+
+func NewProductReposity(Db *gorm.DB) ProductReposityInterface {
 	return &ProductReposity{
 		Db: Db,
 	}

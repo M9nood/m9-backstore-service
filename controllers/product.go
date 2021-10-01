@@ -10,7 +10,7 @@ import (
 )
 
 type ProductHandler struct {
-	productService *service.ProductService
+	productService service.ProductServiceInterface
 }
 
 func NewProductController(db *gorm.DB) ProductHandler {
