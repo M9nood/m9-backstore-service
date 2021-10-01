@@ -5,13 +5,16 @@ import (
 	"os"
 
 	controller "m9-backstore-service/controllers"
+	transport "m9-backstore-service/controllers/http"
 
+	util "m9-backstore-service/utils"
+
+	"github.com/jinzhu/gorm"
 	"github.com/labstack/echo/v4"
 )
 
-func RouterSetup() {
+func RouterSetup(e *echo.Echo, db *gorm.DB) *echo.Echo {
 	port := os.Getenv("PORT")
-	e := echo.New()
 	e.GET("/", func(c echo.Context) error {
 		return c.JSON(http.StatusOK, map[string]string{
 			"message": "Service OK",
@@ -19,9 +22,27 @@ func RouterSetup() {
 			"env":     os.Getenv("APP_ENV"),
 		})
 	})
+	e.GET("/hash", func(c echo.Context) error {
+		text := "test"
+		sault := "Adsar"
+		hash := util.EncryptSHA1(text, sault)
+		return c.JSON(http.StatusOK, map[string]string{
+			"hash": hash,
+		})
+	})
 
-	products := e.Group("/products")
-	products.GET("", controller.GetProductsHandler)
+	pd := controller.NewProductController(db)
+	pdRoute := transport.NewProductHttpRoute(pd)
+	pdRoute.Route(e)
 
-	e.Logger.Fatal(e.Start(":" + port))
+	lb := controller.NewLineBotController(db)
+	lbRoute := transport.NewLineBotHttpRoute(lb)
+	lbRoute.Route(e)
+
+	auth := controller.NewAuthController(db)
+	authRoute := transport.NewAuthHttpRoute(auth)
+	authRoute.Route(e)
+
+	return e
+
 }

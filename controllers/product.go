@@ -5,12 +5,23 @@ import (
 
 	service "m9-backstore-service/services"
 
+	"github.com/jinzhu/gorm"
 	"github.com/labstack/echo/v4"
 )
 
-func GetProductsHandler(c echo.Context) error {
-	productService := service.NewProductService()
-	products, err := productService.GetProductsService()
+type ProductHandler struct {
+	productService service.ProductServiceInterface
+}
+
+func NewProductController(db *gorm.DB) ProductHandler {
+	svc := service.NewProductService(db)
+	return ProductHandler{
+		productService: svc,
+	}
+}
+
+func (h *ProductHandler) GetProductsHandler(c echo.Context) error {
+	products, err := h.productService.GetProductsService()
 	if err != nil {
 		return c.JSON(err.GetHttpCode(), CreateErrorResponse(err))
 	}

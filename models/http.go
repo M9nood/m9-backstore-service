@@ -7,5 +7,5 @@ type ServiceResponse struct {
 	Data         interface{} `json:"data,omitempty"`
 	ErrorCode    string      `json:"errorCode,omitempty"`
 	ErrorName    string      `json:"errorName,omitempty"`
-	ErrorMessage string      `json:"errorMessage,omitempty"`
+	ErrorMessage interface{} `json:"errorMessage,omitempty"`
 }
