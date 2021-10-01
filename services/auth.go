@@ -19,6 +19,7 @@ type AuthService struct {
 
 type AuthServiceInterface interface {
 	RegisterService(register auth.RegisterRequest) (resp string, errSvc iterror.ErrorException)
+	LoginService(user auth.RegisterRequest) (resp string, errSvc iterror.ErrorException)
 }
 
 func NewAuthService(db *gorm.DB) AuthServiceInterface {
@@ -81,4 +82,8 @@ func (s AuthService) RegisterService(register auth.RegisterRequest) (resp string
 	}
 	tx.Commit()
 	return "Register was succesful", nil
+}
+
+func (s AuthService) LoginService(user auth.RegisterRequest) (resp string, errSvc iterror.ErrorException) {
+	return "Logged in", nil
 }
