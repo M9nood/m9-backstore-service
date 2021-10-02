@@ -14,9 +14,10 @@ type UserReposity struct {
 }
 
 type UserReposityInterface interface {
+	GetDB() *gorm.DB
 	CreateUser(user user.UserCreateRequest, tx ...*gorm.DB) (user.UserCreateRequest, iterror.ErrorException)
 	IsExistUser(username string, email string, tx ...*gorm.DB) (bool, iterror.ErrorException)
-	GetDB() *gorm.DB
+	FindByUsernameAndEmail(username string, email string, tx ...*gorm.DB) (user.UserSchema, iterror.ErrorException)
 }
 
 func NewUserReposity(Db *gorm.DB) UserReposityInterface {
@@ -59,4 +60,21 @@ func (r *UserReposity) IsExistUser(username string, email string, tx ...*gorm.DB
 		return true, iterror.ErrorInternalServer("Error check existing user")
 	}
 	return len(user) > 0, nil
+}
+
+func (r *UserReposity) FindByUsernameAndEmail(username string, email string, tx ...*gorm.DB) (user.UserSchema, iterror.ErrorException) {
+	var db *gorm.DB
+	if len(tx) > 0 {
+		db = tx[0]
+	} else {
+		db = r.Db
+	}
+	users := []user.UserSchema{}
+	if err := db.Table("user").Find(&users, "delete_flag = 0 AND lower(username) = lower(?) OR email = lower(?)", username, email).Error; err != nil {
+		return user.UserSchema{}, iterror.ErrorInternalServer("Error find user")
+	}
+	if len(users) == 0 {
+		return user.UserSchema{}, iterror.ErrorBadRequest("User not found")
+	}
+	return users[0], nil
 }

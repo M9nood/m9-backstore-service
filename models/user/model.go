@@ -15,4 +15,5 @@ type UserSchema struct {
 	CreatedAt  null.Time      `gorm:"column:created_at" json:"created_at"`
 	UpatedAt   null.Time      `gorm:"column:updated_at" json:"updated_at"`
 	DeleteFlag int            `gorm:"column:delete_flag" json:"delete_flag"`
+	PassSault  string         `gorm:"column:pass_sault" json:"pass_sault"`
 }

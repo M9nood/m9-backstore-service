@@ -6,6 +6,7 @@ import (
 	"m9-backstore-service/models/store"
 	"m9-backstore-service/models/user"
 	repository "m9-backstore-service/repositories"
+	util "m9-backstore-service/utils"
 
 	iterror "github.com/M9nood/go-iterror"
 	"github.com/jinzhu/gorm"
@@ -19,7 +20,7 @@ type AuthService struct {
 
 type AuthServiceInterface interface {
 	RegisterService(register auth.RegisterRequest) (resp string, errSvc iterror.ErrorException)
-	LoginService(user auth.RegisterRequest) (resp string, errSvc iterror.ErrorException)
+	LoginService(user auth.LoginRequest) (auth.LoginResponse, iterror.ErrorException)
 }
 
 func NewAuthService(db *gorm.DB) AuthServiceInterface {
@@ -33,7 +34,7 @@ func NewAuthService(db *gorm.DB) AuthServiceInterface {
 }
 
 func (s AuthService) RegisterService(register auth.RegisterRequest) (resp string, errSvc iterror.ErrorException) {
-	db := s.UserRepo.GetDB()
+	db := s.Db
 	tx := db.Begin()
 	defer func() {
 		if r := recover(); r != nil {
@@ -84,6 +85,29 @@ func (s AuthService) RegisterService(register auth.RegisterRequest) (resp string
 	return "Register was succesful", nil
 }
 
-func (s AuthService) LoginService(user auth.RegisterRequest) (resp string, errSvc iterror.ErrorException) {
-	return "Logged in", nil
+func (s AuthService) LoginService(user auth.LoginRequest) (auth.LoginResponse, iterror.ErrorException) {
+	resp := auth.LoginResponse{}
+	userFound, err := s.UserRepo.FindByUsernameAndEmail(user.UserName, user.UserName)
+	if err != nil {
+		return resp, err
+	}
+	dbPassword := userFound.Password
+	passHash := util.EncryptSHA1(user.PasswordHash, userFound.PassSault)
+	if passHash != dbPassword {
+		return resp, iterror.ErrorBadRequest("Invalid username or password")
+	}
+
+	jwtSvc := NewJWTAuthService()
+	accessToken := jwtSvc.GenerateToken(userFound.UserName, userFound.Email)
+
+	resp = auth.LoginResponse{
+		Id:       userFound.Id,
+		UserName: userFound.UserName,
+		Email:    userFound.Email,
+		Token: auth.Token{
+			AccessToken: accessToken,
+		},
+	}
+
+	return resp, nil
 }

@@ -1,0 +1,29 @@
+@endpoint = http://localhost:40000
+### check up
+GET {{endpoint}}
+
+
+### Get products
+GET {{endpoint}}/api/v1/products
+
+### Register
+POST {{endpoint}}/api/v1/auth/register
+Content-Type: application/json
+
+{
+  "username": "Vipzfern",
+  "email": "fern2541@hotmail.com",
+  "password" : "",
+  "store_name" : "Retita.cutetape",
+  "store_type" : 1
+}
+
+
+### Login
+POST {{endpoint}}/api/v1/auth/login
+Content-Type: application/json
+
+{
+  "username": "vipzfern",
+  "password" : ""
+}
