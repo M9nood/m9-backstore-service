@@ -14,6 +14,7 @@ type ProductReposity struct {
 
 type ProductReposityInterface interface {
 	GetProducts() ([]product.ProductSchema, iterror.ErrorException)
+	GetProductByCode(code string) (product.ProductSchema, iterror.ErrorException)
 }
 
 func NewProductReposity(Db *gorm.DB) ProductReposityInterface {
@@ -30,4 +31,15 @@ func (repo *ProductReposity) GetProducts() ([]product.ProductSchema, iterror.Err
 		return products, iterror.ErrorInternalServer("Error get products")
 	}
 	return products, nil
+}
+
+func (repo *ProductReposity) GetProductByCode(code string) (product.ProductSchema, iterror.ErrorException) {
+	product := product.ProductSchema{}
+	if err := repo.Db.Table("product").First(&product, "disp_code = ?", code).Error; err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return product, iterror.ErrorNotFound("Error not found product")
+		}
+		return product, iterror.ErrorInternalServer("Error get product")
+	}
+	return product, nil
 }
