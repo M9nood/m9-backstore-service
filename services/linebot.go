@@ -6,7 +6,7 @@ import (
 	"m9-backstore-service/constant"
 	"m9-backstore-service/models/line"
 	"m9-backstore-service/models/product"
-	util "m9-backstore-service/utils"
+	linepkg "m9-backstore-service/pkg/line"
 	"os"
 
 	repository "m9-backstore-service/repositories"
@@ -61,7 +61,7 @@ func (s LineBotService) WatchAndReplyMessage(lineMsg *line.LineMessage) error {
 		return nil
 	}
 	if len(lineMsg.Events) > 0 {
-		botBrain := util.CreateBotBrain(lineMsg.Events[0])
+		botBrain := linepkg.CreateBotBrain(lineMsg.Events[0])
 		if botBrain.Action != "" {
 			msg, err := s.CreateMessageByTriggerMessage(botBrain)
 			if err != nil {
@@ -78,6 +78,8 @@ func (s LineBotService) WatchAndReplyMessage(lineMsg *line.LineMessage) error {
 func (s LineBotService) CreateMessageByTriggerMessage(botBrain line.BotBrain) ([]linebot.SendingMessage, error) {
 	var newMessages []linebot.SendingMessage
 	switch triggerMsg := botBrain.Action; triggerMsg {
+	case constant.Greeting:
+		newMessages, _ = s.MessageCallingBot(botBrain)
 	case constant.GetProduct:
 		if botBrain.Code != "" {
 			newMessages, _ = s.MessageGetProduct(botBrain)
@@ -85,7 +87,7 @@ func (s LineBotService) CreateMessageByTriggerMessage(botBrain line.BotBrain) ([
 			newMessages, _ = s.MessageGetProducts(botBrain)
 		}
 	default:
-		break
+		newMessages, _ = s.MessageCallingBot(botBrain)
 	}
 	return newMessages, nil
 }
@@ -121,5 +123,17 @@ func (s LineBotService) MessageGetProduct(botBrain line.BotBrain) ([]linebot.Sen
 	replyMsg += fmt.Sprintf("%s %s", result.DispCode, result.ProductName)
 
 	newMessages = append(newMessages, linebot.NewTextMessage(replyMsg))
+	return newMessages, nil
+}
+
+func (s LineBotService) MessageCallingBot(botBrain line.BotBrain) ([]linebot.SendingMessage, error) {
+	var newMessages []linebot.SendingMessage
+	message := linebot.NewTextMessage("Hello! Can I help you").
+		WithQuickReplies(
+			linebot.NewQuickReplyItems(
+				linebot.NewQuickReplyButton("", linebot.NewMessageAction("#view", "#view")),
+			),
+		)
+	newMessages = append(newMessages, message)
 	return newMessages, nil
 }
