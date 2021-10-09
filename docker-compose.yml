@@ -1,0 +1,12 @@
+version: '3'
+services:
+  postgres_db:
+    image: postgres:latest
+    network_mode: bridge
+    restart: always
+    ports:
+      - '5432:5432'
+    environment:
+        POSTGRES_USER: ${DB_USER}
+        POSTGRES_PASSWORD: ${DB_PASSWORD}
+        POSTGRES_DB: ${DB_NAME}

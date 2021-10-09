@@ -7,3 +7,8 @@ type RegisterRequest struct {
 	StoreName string `json:"store_name" validate:"required"`
 	StoreType int    `json:"store_type" validate:"required"`
 }
+
+type LoginRequest struct {
+	UserName     string `json:"username" validate:"required"`
+	PasswordHash string `json:"password" validate:"required"`
+}

@@ -16,7 +16,8 @@ func Connect() *gorm.DB {
 	password := os.Getenv("DB_PASSWORD")
 	dbName := os.Getenv("DB_NAME")
 	port := os.Getenv("DB_PORT")
-	dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s", host, user, password, dbName, port)
+	ssl := os.Getenv("DB_SSL_MODE")
+	dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=%s", host, user, password, dbName, port, ssl)
 
 	Db, err := gorm.Open("postgres", dsn)
 

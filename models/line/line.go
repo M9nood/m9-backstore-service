@@ -25,7 +25,7 @@ type BotBrain struct {
 }
 
 type Message struct {
-	ID        string `json:"id"`
+	ID        string `json:"id,omitempty"`
 	Type      string `json:"type"`
 	Text      string `json:"text,omitempty"`
 	PackageId int    `json:"packageId,omitempty"`

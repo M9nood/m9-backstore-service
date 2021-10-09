@@ -6,7 +6,7 @@ import (
 	"m9-backstore-service/constant"
 	"m9-backstore-service/models/line"
 	"m9-backstore-service/models/product"
-	util "m9-backstore-service/utils"
+	linepkg "m9-backstore-service/pkg/line"
 	"os"
 
 	repository "m9-backstore-service/repositories"
@@ -19,6 +19,7 @@ type LineBotService struct {
 	ChannelSecret       string
 	ChannelAccesssToken string
 	Db                  *gorm.DB
+	UserRepo            repository.UserReposityInterface
 }
 
 type LineBotServiceInterface interface {
@@ -28,10 +29,12 @@ type LineBotServiceInterface interface {
 }
 
 func NewLineBotService(db *gorm.DB) LineBotServiceInterface {
+	userRepo := repository.NewUserReposity(db)
 	return &LineBotService{
 		ChannelSecret:       os.Getenv("LINE_CHANNEL_SECRET"),
 		ChannelAccesssToken: os.Getenv("LINE_CHANNEL_ACCESS_TOKEN"),
 		Db:                  db,
+		UserRepo:            userRepo,
 	}
 }
 
@@ -58,7 +61,7 @@ func (s LineBotService) WatchAndReplyMessage(lineMsg *line.LineMessage) error {
 		return nil
 	}
 	if len(lineMsg.Events) > 0 {
-		botBrain := util.CreateBotBrain(lineMsg.Events[0])
+		botBrain := linepkg.CreateBotBrain(lineMsg.Events[0])
 		if botBrain.Action != "" {
 			msg, err := s.CreateMessageByTriggerMessage(botBrain)
 			if err != nil {
@@ -74,22 +77,63 @@ func (s LineBotService) WatchAndReplyMessage(lineMsg *line.LineMessage) error {
 
 func (s LineBotService) CreateMessageByTriggerMessage(botBrain line.BotBrain) ([]linebot.SendingMessage, error) {
 	var newMessages []linebot.SendingMessage
-	var replyMsg string
 	switch triggerMsg := botBrain.Action; triggerMsg {
+	case constant.Greeting:
+		newMessages, _ = s.MessageCallingBot(botBrain)
 	case constant.GetProduct:
-		productRepo := repository.NewProductReposity(s.Db)
-		result, err := productRepo.GetProducts()
-		if err != nil {
-			fmt.Println("err", err)
+		if botBrain.Code != "" {
+			newMessages, _ = s.MessageGetProduct(botBrain)
+		} else {
+			newMessages, _ = s.MessageGetProducts(botBrain)
 		}
-		replyMsg += fmt.Sprintf("%s :\n", botBrain.Title)
-		for _, item := range result {
-			replyMsg += product.ToLineMessage(item)
-		}
-		newMessages = append(newMessages, linebot.NewTextMessage(replyMsg))
-		return newMessages, nil
 	default:
-		break
+		newMessages, _ = s.MessageCallingBot(botBrain)
 	}
+	return newMessages, nil
+}
+
+func (s LineBotService) MessageGetProducts(botBrain line.BotBrain) ([]linebot.SendingMessage, error) {
+	var newMessages []linebot.SendingMessage
+	var replyMsg string
+	productRepo := repository.NewProductReposity(s.Db)
+	result, err := productRepo.GetProducts()
+	if err != nil {
+		return newMessages, err
+	}
+	replyMsg += fmt.Sprintf("%s :\n", botBrain.Title)
+	for _, item := range result {
+		replyMsg += product.ToLineMessage(item)
+	}
+	newMessages = append(newMessages, linebot.NewTextMessage(replyMsg))
+	return newMessages, nil
+}
+
+func (s LineBotService) MessageGetProduct(botBrain line.BotBrain) ([]linebot.SendingMessage, error) {
+	var newMessages []linebot.SendingMessage
+	var replyMsg string
+	productRepo := repository.NewProductReposity(s.Db)
+	result, err := productRepo.GetProductByCode(botBrain.Code)
+	if err != nil {
+		if err.GetCode() == "404" {
+			newMessages = append(newMessages, linebot.NewTextMessage(err.Error()))
+			return newMessages, nil
+		}
+		return newMessages, err
+	}
+	replyMsg += fmt.Sprintf("%s %s", result.DispCode, result.ProductName)
+
+	newMessages = append(newMessages, linebot.NewTextMessage(replyMsg))
+	return newMessages, nil
+}
+
+func (s LineBotService) MessageCallingBot(botBrain line.BotBrain) ([]linebot.SendingMessage, error) {
+	var newMessages []linebot.SendingMessage
+	message := linebot.NewTextMessage("Hello! Can I help you").
+		WithQuickReplies(
+			linebot.NewQuickReplyItems(
+				linebot.NewQuickReplyButton("", linebot.NewMessageAction("#view", "#view")),
+			),
+		)
+	newMessages = append(newMessages, message)
 	return newMessages, nil
 }
