@@ -96,7 +96,8 @@ func (s LineBotService) MessageGetProducts(botBrain line.BotBrain) ([]linebot.Se
 	var newMessages []linebot.SendingMessage
 	var replyMsg string
 	productRepo := repository.NewProductReposity(s.Db)
-	result, err := productRepo.GetProducts()
+	key := 1
+	result, err := productRepo.GetProducts(&key)
 	if err != nil {
 		return newMessages, err
 	}

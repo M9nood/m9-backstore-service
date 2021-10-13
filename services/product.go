@@ -15,7 +15,7 @@ type ProductService struct {
 }
 
 type ProductServiceInterface interface {
-	GetProductsService() ([]product.ProductSchema, iterror.ErrorException)
+	GetProductsInStoreService(storeId *int) ([]product.ProductSchema, iterror.ErrorException)
 }
 
 func NewProductService(db *gorm.DB) ProductServiceInterface {
@@ -26,8 +26,8 @@ func NewProductService(db *gorm.DB) ProductServiceInterface {
 	}
 }
 
-func (s ProductService) GetProductsService() ([]product.ProductSchema, iterror.ErrorException) {
-	result, err := s.ProductRepo.GetProducts()
+func (s ProductService) GetProductsInStoreService(storeId *int) ([]product.ProductSchema, iterror.ErrorException) {
+	result, err := s.ProductRepo.GetProducts(storeId)
 	if err != nil {
 		return result, err
 	}

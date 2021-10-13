@@ -2,6 +2,7 @@ package http
 
 import (
 	controller "m9-backstore-service/controllers"
+	auth "m9-backstore-service/controllers/middleware"
 
 	"github.com/labstack/echo/v4"
 )
@@ -18,6 +19,6 @@ func NewProductHttpRoute(productHandler controller.ProductHandler) productHttpRo
 
 func (h productHttpRoute) Route(e *echo.Echo) {
 	apiV1 := e.Group("/api/v1")
-	productRoute := apiV1.Group("/products")
+	productRoute := apiV1.Group("/products", auth.IsLoggedIn)
 	productRoute.GET("", h.handler.GetProductsHandler)
 }
