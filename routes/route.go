@@ -18,7 +18,8 @@ func RouterSetup(e *echo.Echo, db *gorm.DB) *echo.Echo {
 	e.GET("/", func(c echo.Context) error {
 		return c.JSON(http.StatusOK, map[string]string{
 			"message": "Service OK",
-			"port":    port,
+			"prtt":    port,
+			"version": "0.0.2",
 			"env":     os.Getenv("APP_ENV"),
 		})
 	})

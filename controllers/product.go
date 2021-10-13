@@ -5,23 +5,32 @@ import (
 
 	service "m9-backstore-service/services"
 
+	"github.com/M9nood/go-iterror"
 	"github.com/jinzhu/gorm"
 	"github.com/labstack/echo/v4"
 )
 
 type ProductHandler struct {
-	productService service.ProductServiceInterface
+	jwtTokenService service.JWTServiceInterface
+	productService  service.ProductServiceInterface
 }
 
 func NewProductController(db *gorm.DB) ProductHandler {
-	svc := service.NewProductService(db)
+	jwtSvc := service.NewJWTAuthService()
+	prodSvc := service.NewProductService(db)
 	return ProductHandler{
-		productService: svc,
+		jwtTokenService: jwtSvc,
+		productService:  prodSvc,
 	}
 }
 
 func (h *ProductHandler) GetProductsHandler(c echo.Context) error {
-	products, err := h.productService.GetProductsService()
+	authToken := c.Request().Header.Get("Authorization")
+	dataToken, errParse := h.jwtTokenService.ParseToken(authToken)
+	if errParse != nil {
+		return c.JSON(400, CreateErrorResponse(iterror.ErrorBadRequest("Invalid token")))
+	}
+	products, err := h.productService.GetProductsInStoreService(dataToken.StoreId)
 	if err != nil {
 		return c.JSON(err.GetHttpCode(), CreateErrorResponse(err))
 	}

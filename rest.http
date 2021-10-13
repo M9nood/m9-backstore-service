@@ -1,10 +1,13 @@
-@endpoint = http://localhost:40000
+@endpoint = http://localhost:4000
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwibmFtZSI6Im05bm9vZCIsImVtYWlsIjoic3B3Lm50d0BnbWFpbC5jb20iLCJzdG9yZV9pZCI6MSwiZXhwIjoxNjM0Mjg0NjcwLCJpYXQiOjE2MzQxMTE4NzAsImlzcyI6IkJpa2FzaCJ9.vpSBiLmkjMgwgvqRMvQdjroTZnKWyKxD6iYHhEeIjZI
 ### check up
 GET {{endpoint}}
 
 
 ### Get products
 GET {{endpoint}}/api/v1/products
+Content-Type: application/json
+Authorization: Bearer {{token}}
 
 ### Register
 POST {{endpoint}}/api/v1/auth/register
@@ -13,7 +16,7 @@ Content-Type: application/json
 {
   "username": "Vipzfern",
   "email": "fern2541@hotmail.com",
-  "password" : "",
+  "password" : "Qwe",
   "store_name" : "Retita.cutetape",
   "store_type" : 1
 }
@@ -24,6 +27,6 @@ POST {{endpoint}}/api/v1/auth/login
 Content-Type: application/json
 
 {
-  "username": "vipzfern",
-  "password" : ""
+  "username": "m9nood",
+  "password" : "7848055df09311652b2ac208549e981c9c529f88"
 }

@@ -96,17 +96,23 @@ func (s AuthService) LoginService(user auth.LoginRequest) (auth.LoginResponse, i
 	if passHash != dbPassword {
 		return resp, iterror.ErrorBadRequest("Invalid username or password")
 	}
-
-	jwtSvc := NewJWTAuthService()
-	accessToken := jwtSvc.GenerateToken(userFound.UserName, userFound.Email)
-
-	resp = auth.LoginResponse{
+	storeId, err := s.StoreRepo.FindStoreIdFromUser(userFound.Id)
+	if err != nil {
+		return resp, err
+	}
+	payload := auth.LoginResponse{
 		Id:       userFound.Id,
 		UserName: userFound.UserName,
 		Email:    userFound.Email,
-		Token: auth.Token{
-			AccessToken: accessToken,
-		},
+		StoreId:  storeId,
+	}
+
+	jwtSvc := NewJWTAuthService()
+	accessToken := jwtSvc.GenerateToken(payload)
+
+	resp = payload
+	resp.Token = auth.Token{
+		AccessToken: accessToken,
 	}
 
 	return resp, nil

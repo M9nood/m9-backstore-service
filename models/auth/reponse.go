@@ -4,7 +4,8 @@ type LoginResponse struct {
 	Id       int    `json:"id"`
 	UserName string `json:"username"`
 	Email    string `json:"email"`
-	Token    Token  `json:"token"`
+	StoreId  *int   `json:"store_id"`
+	Token    Token  `json:"token,omitempty"`
 }
 
 type Token struct {

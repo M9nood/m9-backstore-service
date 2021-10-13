@@ -1,7 +1,6 @@
 package repository
 
 import (
-	"fmt"
 	"m9-backstore-service/models/product"
 
 	iterror "github.com/M9nood/go-iterror"
@@ -13,7 +12,7 @@ type ProductReposity struct {
 }
 
 type ProductReposityInterface interface {
-	GetProducts() ([]product.ProductSchema, iterror.ErrorException)
+	GetProducts(storeId *int) ([]product.ProductSchema, iterror.ErrorException)
 	GetProductByCode(code string) (product.ProductSchema, iterror.ErrorException)
 }
 
@@ -23,11 +22,10 @@ func NewProductReposity(Db *gorm.DB) ProductReposityInterface {
 	}
 }
 
-func (repo *ProductReposity) GetProducts() ([]product.ProductSchema, iterror.ErrorException) {
+func (repo *ProductReposity) GetProducts(storeId *int) ([]product.ProductSchema, iterror.ErrorException) {
 	products := []product.ProductSchema{}
-	result := repo.Db.Table("product").Find(&products)
+	result := repo.Db.Table("product").Where("store_id = ?", storeId).Where("delete_flag = 0").Find(&products)
 	if result.Error != nil {
-		fmt.Println("erro", result.Error)
 		return products, iterror.ErrorInternalServer("Error get products")
 	}
 	return products, nil
