@@ -4,7 +4,7 @@ import (
 	"log"
 	"net/http"
 
-	"m9-backstore-service/models/auth"
+	model "m9-backstore-service/models/auth"
 	"m9-backstore-service/pkg"
 	service "m9-backstore-service/services"
 
@@ -25,7 +25,7 @@ func NewAuthController(db *gorm.DB) AuthHandler {
 }
 
 func (h *AuthHandler) RegisterHandler(c echo.Context) error {
-	requestData := auth.RegisterRequest{}
+	requestData := model.RegisterRequest{}
 	if err := c.Bind(&requestData); err != nil {
 		log.Println("register err binding: ", err)
 		return c.JSON(http.StatusUnprocessableEntity, CreateErrorResponse(iterror.ErrorBadRequest("Invalid request data")))
@@ -42,7 +42,7 @@ func (h *AuthHandler) RegisterHandler(c echo.Context) error {
 }
 
 func (h *AuthHandler) LoginHandler(c echo.Context) error {
-	requestData := auth.LoginRequest{}
+	requestData := model.LoginRequest{}
 	if err := c.Bind(&requestData); err != nil {
 		log.Println("login err binding: ", err)
 		return c.JSON(http.StatusUnprocessableEntity, CreateErrorResponse(iterror.ErrorBadRequest("Invalid request data")))
