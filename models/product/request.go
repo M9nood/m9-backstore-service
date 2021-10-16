@@ -2,7 +2,7 @@ package product
 
 import "github.com/guregu/null"
 
-type ProductCreateRequest struct {
+type ProductRequest struct {
 	Id          int        `json:"id,omitempty"`
 	ProductName string     `json:"product_name"  validate:"required"`
 	Description string     `json:"description"`
@@ -13,7 +13,7 @@ type ProductCreateRequest struct {
 	Price       null.Float `json:"price"`
 }
 
-func (p ProductCreateRequest) ToProductSchema() ProductSchema {
+func (p ProductRequest) ToProductSchema() ProductSchema {
 	return ProductSchema{
 		Id:          p.Id,
 		ProductName: p.ProductName,

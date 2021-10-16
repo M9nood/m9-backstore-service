@@ -2,6 +2,7 @@ package repository
 
 import (
 	"m9-backstore-service/models/product"
+	"time"
 
 	iterror "github.com/M9nood/go-iterror"
 	"github.com/jinzhu/gorm"
@@ -17,6 +18,8 @@ type ProductReposityInterface interface {
 	GetProducts(storeId *int) ([]product.ProductSchema, iterror.ErrorException)
 	GetProductByCode(code string) (product.ProductSchema, iterror.ErrorException)
 	CreateProduct(productData product.ProductSchema) (product.ProductSchema, iterror.ErrorException)
+	UpdateProduct(productUuid string, productData product.ProductSchema) (product.ProductSchema, iterror.ErrorException)
+	DeleteProduct(productUuid string) iterror.ErrorException
 }
 
 func NewProductReposity(Db *gorm.DB) ProductReposityInterface {
@@ -50,4 +53,20 @@ func (repo *ProductReposity) CreateProduct(productData product.ProductSchema) (p
 		return productData, iterror.ErrorInternalServer("Error create product")
 	}
 	return productData, nil
+}
+
+func (repo *ProductReposity) UpdateProduct(productUuid string, productData product.ProductSchema) (product.ProductSchema, iterror.ErrorException) {
+	now := time.Now()
+	productData.UpdatedAt = &now
+	if err := repo.Db.Table(tableName).Where("product_uuid = ?", productUuid).Update(&productData).Error; err != nil {
+		return productData, iterror.ErrorInternalServer("Error update product")
+	}
+	return productData, nil
+}
+
+func (repo *ProductReposity) DeleteProduct(productUuid string) iterror.ErrorException {
+	if err := repo.Db.Table(tableName).Where("product_uuid = ?", productUuid).Update(map[string]interface{}{"delete_flag": 1, "updated_at": time.Now()}).Error; err != nil {
+		return iterror.ErrorInternalServer("Error delete product")
+	}
+	return nil
 }

@@ -22,5 +22,7 @@ func (h productHttpRoute) Route(e *echo.Echo) {
 	productRoute := apiV1.Group("/products", auth.IsAuth)
 	productRoute.GET("", h.handler.GetProductsHandler)
 	productRoute.POST("", h.handler.CreateProductHandler)
+	productRoute.PATCH("/:product_uuid", h.handler.UpdateProductHandler)
+	productRoute.DELETE("/:product_uuid", h.handler.DeleteProductHandler)
 
 }
