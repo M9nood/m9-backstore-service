@@ -19,7 +19,7 @@ func NewProductHttpRoute(productHandler controller.ProductHandler) productHttpRo
 
 func (h productHttpRoute) Route(e *echo.Echo) {
 	apiV1 := e.Group("/api/v1")
-	productRoute := apiV1.Group("/products", auth.IsLoggedIn)
+	productRoute := apiV1.Group("/products", auth.IsAuth)
 	productRoute.GET("", h.handler.GetProductsHandler)
 	productRoute.POST("", h.handler.CreateProductHandler)
 

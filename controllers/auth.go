@@ -14,13 +14,16 @@ import (
 )
 
 type AuthHandler struct {
-	authService service.AuthServiceInterface
+	authService     service.AuthServiceInterface
+	jwtTokenService service.JWTServiceInterface
 }
 
 func NewAuthController(db *gorm.DB) AuthHandler {
+	jwtSvc := service.NewJWTAuthService()
 	svc := service.NewAuthService(db)
 	return AuthHandler{
-		authService: svc,
+		authService:     svc,
+		jwtTokenService: jwtSvc,
 	}
 }
 
@@ -56,4 +59,22 @@ func (h *AuthHandler) LoginHandler(c echo.Context) error {
 		return c.JSON(err.GetHttpCode(), CreateErrorResponse(err))
 	}
 	return c.JSON(http.StatusOK, CreateSuccessResponse(user))
+}
+
+func (h *AuthHandler) RefreshTokenHandler(c echo.Context) error {
+	requestData := model.RefreshTokenRequest{}
+	if err := c.Bind(&requestData); err != nil {
+		log.Println("refresh token request err binding: ", err)
+		return c.JSON(http.StatusUnprocessableEntity, CreateErrorResponse(iterror.ErrorBadRequest("Invalid request data")))
+	}
+	rfToken := requestData.RefreshToken
+	dataToken, errParse := h.jwtTokenService.ParseRefreshToken(rfToken)
+	if errParse != nil {
+		return c.JSON(400, CreateErrorResponse(iterror.ErrorBadRequest("Invalid token")))
+	}
+	token, err := h.authService.RefreshTokenService(dataToken.UserId)
+	if err != nil {
+		return c.JSON(err.GetHttpCode(), CreateErrorResponse(err))
+	}
+	return c.JSON(http.StatusOK, CreateSuccessResponse(token))
 }

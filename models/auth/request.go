@@ -12,3 +12,7 @@ type LoginRequest struct {
 	UserName     string `json:"username" validate:"required"`
 	PasswordHash string `json:"password" validate:"required"`
 }
+
+type RefreshTokenRequest struct {
+	RefreshToken string `json:"refresh_token" validate:"required"`
+}
