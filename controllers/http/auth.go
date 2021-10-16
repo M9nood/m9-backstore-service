@@ -21,4 +21,5 @@ func (h authHttpRoute) Route(e *echo.Echo) {
 	authRoute := apiV1.Group("/auth")
 	authRoute.POST("/register", h.handler.RegisterHandler)
 	authRoute.POST("/login", h.handler.LoginHandler)
+	authRoute.POST("/refresh-token", h.handler.RefreshTokenHandler)
 }

@@ -29,8 +29,8 @@ var config = middleware.JWTConfig{
 		return token, nil
 	},
 	ErrorHandlerWithContext: func(err error, c echo.Context) error {
-		return c.JSON(400, controller.CreateErrorResponse(iterror.ErrorBadRequest("Invalid token")))
+		return c.JSON(400, controller.CreateErrorResponse(iterror.ErrorUnauthorized(err.Error())))
 	},
 }
 
-var IsLoggedIn = middleware.JWTWithConfig(config)
+var IsAuth = middleware.JWTWithConfig(config)

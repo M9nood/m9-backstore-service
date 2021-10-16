@@ -21,6 +21,7 @@ type AuthService struct {
 type AuthServiceInterface interface {
 	RegisterService(register auth.RegisterRequest) (resp string, errSvc iterror.ErrorException)
 	LoginService(user auth.LoginRequest) (auth.LoginResponse, iterror.ErrorException)
+	RefreshTokenService(userId int) (auth.Token, iterror.ErrorException)
 }
 
 func NewAuthService(db *gorm.DB) AuthServiceInterface {
@@ -109,11 +110,38 @@ func (s AuthService) LoginService(user auth.LoginRequest) (auth.LoginResponse, i
 
 	jwtSvc := NewJWTAuthService()
 	accessToken := jwtSvc.GenerateToken(payload)
+	refreshToken := jwtSvc.GenerateRefreshToken(userFound.Id)
 
 	resp = payload
 	resp.Token = auth.Token{
-		AccessToken: accessToken,
+		AccessToken:  accessToken,
+		RefreshToken: refreshToken,
 	}
 
+	return resp, nil
+}
+
+func (s AuthService) RefreshTokenService(userId int) (auth.Token, iterror.ErrorException) {
+	resp := auth.Token{}
+	userFound, err := s.UserRepo.FindById(userId)
+	if err != nil {
+		return resp, err
+	}
+	storeId, err := s.StoreRepo.FindStoreIdFromUser(userId)
+	if err != nil {
+		return resp, err
+	}
+	payload := auth.LoginResponse{
+		Id:       userId,
+		UserName: userFound.UserName,
+		Email:    userFound.Email,
+		StoreId:  storeId,
+	}
+
+	jwtSvc := NewJWTAuthService()
+	accessToken := jwtSvc.GenerateToken(payload)
+	refreshToken := jwtSvc.GenerateRefreshToken(userId)
+	resp.AccessToken = accessToken
+	resp.RefreshToken = refreshToken
 	return resp, nil
 }
