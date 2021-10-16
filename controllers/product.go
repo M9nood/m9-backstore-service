@@ -48,7 +48,7 @@ func (h *ProductHandler) CreateProductHandler(c echo.Context) error {
 		return c.JSON(400, CreateErrorResponse(iterror.ErrorBadRequest("Invalid token")))
 	}
 
-	requestData := model.ProductCreateRequest{}
+	requestData := model.ProductRequest{}
 	if err := c.Bind(&requestData); err != nil {
 		log.Println("create product err binding: ", err)
 		return c.JSON(http.StatusUnprocessableEntity, CreateErrorResponse(iterror.ErrorBadRequest("Invalid request data")))
@@ -58,6 +58,43 @@ func (h *ProductHandler) CreateProductHandler(c echo.Context) error {
 		return c.JSON(http.StatusUnprocessableEntity, CreateErrorResponse(iterror.ErrorBadRequest("Invalid request data"), pkg.ParseValidationError(err)))
 	}
 	result, err := h.productService.CreateProductService(dataToken.StoreId, requestData)
+	if err != nil {
+		return c.JSON(err.GetHttpCode(), CreateErrorResponse(err))
+	}
+	return c.JSON(http.StatusOK, CreateSuccessResponse(result))
+}
+
+func (h *ProductHandler) UpdateProductHandler(c echo.Context) error {
+	authToken := c.Request().Header.Get("Authorization")
+	if _, errParse := h.jwtTokenService.ParseToken(authToken); errParse != nil {
+		return c.JSON(400, CreateErrorResponse(iterror.ErrorBadRequest("Invalid token")))
+	}
+
+	productUuid := c.Param("product_uuid")
+	requestData := model.ProductRequest{}
+	if err := c.Bind(&requestData); err != nil {
+		log.Println("update product err binding: ", err)
+		return c.JSON(http.StatusUnprocessableEntity, CreateErrorResponse(iterror.ErrorBadRequest("Invalid request data")))
+	}
+	if err := c.Validate(requestData); err != nil {
+		log.Println("validate err binding: ", err)
+		return c.JSON(http.StatusUnprocessableEntity, CreateErrorResponse(iterror.ErrorBadRequest("Invalid request data"), pkg.ParseValidationError(err)))
+	}
+	result, err := h.productService.UpdateProductService(productUuid, requestData)
+	if err != nil {
+		return c.JSON(err.GetHttpCode(), CreateErrorResponse(err))
+	}
+	return c.JSON(http.StatusOK, CreateSuccessResponse(result))
+}
+
+func (h *ProductHandler) DeleteProductHandler(c echo.Context) error {
+	authToken := c.Request().Header.Get("Authorization")
+	if _, errParse := h.jwtTokenService.ParseToken(authToken); errParse != nil {
+		return c.JSON(400, CreateErrorResponse(iterror.ErrorBadRequest("Invalid token")))
+	}
+
+	productUuid := c.Param("product_uuid")
+	result, err := h.productService.DeleteProductService(productUuid)
 	if err != nil {
 		return c.JSON(err.GetHttpCode(), CreateErrorResponse(err))
 	}

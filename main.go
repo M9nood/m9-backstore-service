@@ -2,6 +2,8 @@ package main
 
 import (
 	"context"
+	"fmt"
+	"io/ioutil"
 	"m9-backstore-service/database"
 	"m9-backstore-service/pkg"
 	"os"
@@ -21,6 +23,8 @@ func init() {
 
 func main() {
 	e := echo.New()
+	e.HideBanner = true
+	printServiceRunBanner()
 	e.Use(middleware.Recover())
 	e.Use(middleware.GzipWithConfig(middleware.GzipConfig{
 		Level: 6,
@@ -53,6 +57,16 @@ func main() {
 	defer cancel()
 	if err := e.Shutdown(ctx); err != nil {
 		e.Logger.Fatal(err)
+	}
+
+}
+
+func printServiceRunBanner() {
+	customBanner, err := ioutil.ReadFile("banner.txt")
+	if err != nil {
+		return
+	} else {
+		fmt.Println(string(customBanner))
 	}
 
 }
