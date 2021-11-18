@@ -14,3 +14,8 @@ type ProductResponse struct {
 	Cost        null.Float `json:"cost"`
 	Price       null.Float `json:"price"`
 }
+
+type ProductsWithCountResponse struct {
+	Products  []ProductResponse `json:"products"`
+	TotalRows uint              `json:"totalRows"`
+}

@@ -13,6 +13,13 @@ type ProductRequest struct {
 	Price       null.Float `json:"price"`
 }
 
+type ProductQueryParams struct {
+	Page     *int    `query:"page" json:"page,omitempty"`
+	PageSize *int    `query:"pageSize" json:"pageSize,omitempty"`
+	Q        *string `query:"q" json:"q,omitempty"`
+	Count    bool
+}
+
 func (p ProductRequest) ToProductSchema() ProductSchema {
 	return ProductSchema{
 		Id:          p.Id,

@@ -97,12 +97,12 @@ func (s LineBotService) MessageGetProducts(botBrain line.BotBrain) ([]linebot.Se
 	var replyMsg string
 	productRepo := repository.NewProductReposity(s.Db)
 	key := 1
-	result, err := productRepo.GetProducts(&key)
+	result, err := productRepo.GetProducts(&key, product.ProductQueryParams{})
 	if err != nil {
 		return newMessages, err
 	}
 	replyMsg += fmt.Sprintf("%s :\n", botBrain.Title)
-	for _, item := range result {
+	for _, item := range result.Products {
 		replyMsg += product.ToLineMessage(item)
 	}
 	newMessages = append(newMessages, linebot.NewTextMessage(replyMsg))

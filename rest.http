@@ -1,11 +1,11 @@
 @endpoint = http://localhost:4000
-@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwibmFtZSI6Im05bm9vZCIsImVtYWlsIjoic3B3Lm50d0BnbWFpbC5jb20iLCJzdG9yZV9pZCI6MSwiZXhwIjoxNjM0Mjg0NjcwLCJpYXQiOjE2MzQxMTE4NzAsImlzcyI6IkJpa2FzaCJ9.vpSBiLmkjMgwgvqRMvQdjroTZnKWyKxD6iYHhEeIjZI
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwibmFtZSI6Im05bm9vZCIsImVtYWlsIjoic3B3Lm50d0BnbWFpbC5jb20iLCJzdG9yZV9pZCI6MSwiZXhwIjoxNjM3MzA0MjQxLCJpYXQiOjE2MzcyMTc4NDEsImlzcyI6Im05In0.DFqr3TUDLmVIP807BpO3JWTd47WkBvPWb7YeRLE6VOw
 ### check up
 GET {{endpoint}}
 
 
 ### Get products
-GET {{endpoint}}/api/v1/products
+GET {{endpoint}}/api/v1/products?page=2&pageSize=1
 Content-Type: application/json
 Authorization: Bearer {{token}}
 

@@ -15,7 +15,7 @@ type ProductService struct {
 }
 
 type ProductServiceInterface interface {
-	GetProductsInStoreService(storeId *int) ([]product.ProductResponse, iterror.ErrorException)
+	GetProductsInStoreService(storeId *int, query product.ProductQueryParams) (product.ProductsWithCountResponse, iterror.ErrorException)
 	CreateProductService(storeId *int, pd product.ProductRequest) (string, iterror.ErrorException)
 	UpdateProductService(productUuid string, pd product.ProductRequest) (string, iterror.ErrorException)
 	DeleteProductService(productUuid string) (string, iterror.ErrorException)
@@ -29,12 +29,12 @@ func NewProductService(db *gorm.DB) ProductServiceInterface {
 	}
 }
 
-func (s ProductService) GetProductsInStoreService(storeId *int) ([]product.ProductResponse, iterror.ErrorException) {
-	result, err := s.ProductRepo.GetProducts(storeId)
+func (s ProductService) GetProductsInStoreService(storeId *int, query product.ProductQueryParams) (product.ProductsWithCountResponse, iterror.ErrorException) {
+	result, err := s.ProductRepo.GetProducts(storeId, query)
 	if err != nil {
-		return product.Products(result).Response(), err
+		return result.Response(), err
 	}
-	return product.Products(result).Response(), nil
+	return result.Response(), nil
 }
 
 func (s ProductService) CreateProductService(storeId *int, pd product.ProductRequest) (string, iterror.ErrorException) {

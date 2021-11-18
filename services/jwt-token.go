@@ -60,7 +60,7 @@ func (service *jwtServices) GenerateToken(payload auth.LoginResponse) string {
 		payload.Email,
 		payload.StoreId,
 		jwt.StandardClaims{
-			ExpiresAt: time.Now().Add(time.Hour * 1).Unix(),
+			ExpiresAt: time.Now().Add(time.Hour * 24).Unix(),
 			Issuer:    service.issure,
 			IssuedAt:  time.Now().Unix(),
 		},

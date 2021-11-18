@@ -23,6 +23,11 @@ type ProductSchema struct {
 	DeleteFlag  int        `gorm:"column:delete_flag" json:"delete_flag"`
 }
 
+type ProductsWithCount struct {
+	Products  []ProductSchema `json:"products"`
+	TotalRows uint            `json:"totalRows"`
+}
+
 type Products []ProductSchema
 
 func ToLineMessage(p ProductSchema) string {
@@ -52,4 +57,11 @@ func (ps Products) Response() []ProductResponse {
 		res = append(res, item.Response())
 	}
 	return res
+}
+
+func (p ProductsWithCount) Response() ProductsWithCountResponse {
+	return ProductsWithCountResponse{
+		TotalRows: p.TotalRows,
+		Products:  Products(p.Products).Response(),
+	}
 }

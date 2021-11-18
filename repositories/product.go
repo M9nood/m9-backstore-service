@@ -15,7 +15,7 @@ type ProductReposity struct {
 var tableName string = "product"
 
 type ProductReposityInterface interface {
-	GetProducts(storeId *int) ([]product.ProductSchema, iterror.ErrorException)
+	GetProducts(storeId *int, q product.ProductQueryParams) (product.ProductsWithCount, iterror.ErrorException)
 	GetProductByCode(code string) (product.ProductSchema, iterror.ErrorException)
 	CreateProduct(productData product.ProductSchema) (product.ProductSchema, iterror.ErrorException)
 	UpdateProduct(productUuid string, productData product.ProductSchema) (product.ProductSchema, iterror.ErrorException)
@@ -28,13 +28,42 @@ func NewProductReposity(Db *gorm.DB) ProductReposityInterface {
 	}
 }
 
-func (repo *ProductReposity) GetProducts(storeId *int) ([]product.ProductSchema, iterror.ErrorException) {
-	products := []product.ProductSchema{}
-	result := repo.Db.Table(tableName).Where("store_id = ?", storeId).Where("delete_flag = 0").Find(&products)
-	if result.Error != nil {
-		return products, iterror.ErrorInternalServer("Error get products")
+func queryCondition(stmt *gorm.DB, q product.ProductQueryParams) *gorm.DB {
+	if q.Q != nil {
+		stmt = stmt.Where("product_name LIKE ?", "%Buzz%")
 	}
-	return products, nil
+	if q.Page != nil {
+		pageSize := 10
+		if q.PageSize != nil {
+			pageSize = *q.PageSize
+		}
+		offset := (pageSize * (*q.Page)) - pageSize
+		stmt = stmt.Limit(pageSize).Offset(offset)
+	}
+	return stmt
+}
+
+func (repo *ProductReposity) GetProducts(storeId *int, q product.ProductQueryParams) (product.ProductsWithCount, iterror.ErrorException) {
+	productList := product.ProductsWithCount{}
+	query := repo.Db.Table(tableName).Where("store_id = ?", storeId).Where("delete_flag = 0")
+	q.Count = true
+	if q.Q != nil {
+		query = query.Where("product_name LIKE ?", "%"+*q.Q+"%")
+	}
+	query = query.Count(&productList.TotalRows)
+	if q.Page != nil {
+		pageSize := 10
+		if q.PageSize != nil {
+			pageSize = *q.PageSize
+		}
+		offset := (pageSize * (*q.Page)) - pageSize
+		query = query.Limit(pageSize).Offset(offset)
+	}
+	result := query.Find(&productList.Products)
+	if result.Error != nil {
+		return productList, iterror.ErrorInternalServer("Error get products")
+	}
+	return productList, nil
 }
 
 func (repo *ProductReposity) GetProductByCode(code string) (product.ProductSchema, iterror.ErrorException) {

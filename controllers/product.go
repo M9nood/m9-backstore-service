@@ -34,7 +34,12 @@ func (h *ProductHandler) GetProductsHandler(c echo.Context) error {
 	if errParse != nil {
 		return c.JSON(400, CreateErrorResponse(iterror.ErrorBadRequest("Invalid token")))
 	}
-	products, err := h.productService.GetProductsInStoreService(dataToken.StoreId)
+	query := model.ProductQueryParams{}
+	if err := c.Bind(&query); err != nil {
+		log.Println("query binding error: ", err)
+		return c.JSON(http.StatusUnprocessableEntity, CreateErrorResponse(iterror.ErrorBadRequest("Invalid request data")))
+	}
+	products, err := h.productService.GetProductsInStoreService(dataToken.StoreId, query)
 	if err != nil {
 		return c.JSON(err.GetHttpCode(), CreateErrorResponse(err))
 	}
